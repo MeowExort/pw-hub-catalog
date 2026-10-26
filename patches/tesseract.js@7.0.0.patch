@@ -1,0 +1,133 @@
+diff --git a/src/createWorker.js b/src/createWorker.js
+index 89b53b89b27f6579155ed2a0ef372fa8c2a8b8e6..226cc40027b66eb06f4811fcecc3e11b6f0c7028 100644
+--- a/src/createWorker.js
++++ b/src/createWorker.js
+@@ -21,12 +21,15 @@ module.exports = async (langs = 'eng', oem = OEM.LSTM_ONLY, _options = {}, confi
+   const {
+     logger,
+     errorHandler,
++    signal,
+     ...options
+   } = resolvePaths({
+     ...defaultOptions,
+     ..._options,
+   });
++  if (signal && signal.aborted) throw signal.reason;
+   const promises = {};
++  let terminalReason = null;
+ 
+   // Current langs, oem, and config file.
+   // Used if the user ever re-initializes the worker using `worker.reinitialize`.
+@@ -41,15 +44,44 @@ module.exports = async (langs = 'eng', oem = OEM.LSTM_ONLY, _options = {}, confi
+     workerResResolve = resolve;
+     workerResReject = reject;
+   });
+-  const workerError = (event) => { workerResReject(event.message); };
++  const workerError = (event) => {
++    if (event.preventDefault) event.preventDefault();
++    failWorker(event.message);
++  };
+ 
+   let worker = spawnWorker(options);
+   worker.onerror = workerError;
+ 
+   workerCounter += 1;
+ 
++  // Работник принадлежит вызывающей стороне уже во время загрузки языков и WASM.
++  function failWorker(reason) {
++    if (terminalReason) return;
++    terminalReason = reason instanceof Error ? reason : new Error(String(reason));
++    if (worker !== null) {
++      terminateWorker(worker);
++      worker = null;
++    }
++    if (signal) signal.removeEventListener('abort', abortWorker);
++    Object.keys(promises).forEach((key) => {
++      promises[key].reject(terminalReason);
++      delete promises[key];
++    });
++    workerResReject(terminalReason);
++  }
++
++  function abortWorker() {
++    const error = new Error('OCR operation cancelled');
++    error.name = 'AbortError';
++    failWorker(signal && signal.reason ? signal.reason : error);
++  }
++
+   const startJob = ({ id: jobId, action, payload }) => (
+     new Promise((resolve, reject) => {
++      if (terminalReason) {
++        reject(terminalReason);
++        return;
++      }
+       log(`[${id}]: Start ${jobId}, action=${action}`);
+       // Using both `action` and `jobId` in case user provides non-unique `jobId`.
+       const promiseId = `${action}-${jobId}`;
+@@ -186,35 +218,24 @@ module.exports = async (langs = 'eng', oem = OEM.LSTM_ONLY, _options = {}, confi
+   };
+ 
+   const terminate = async () => {
+-    if (worker !== null) {
+-      /*
+-      await startJob(createJob({
+-        id: jobId,
+-        action: 'terminate',
+-      }));
+-      */
+-      terminateWorker(worker);
+-      worker = null;
+-    }
++    abortWorker();
+     return Promise.resolve();
+   };
+ 
+   onMessage(worker, ({
+     workerId, jobId, status, action, data,
+   }) => {
++    if (terminalReason) return;
+     const promiseId = `${action}-${jobId}`;
+     if (status === 'resolve') {
++      if (!promises[promiseId]) return;
+       log(`[${workerId}]: Complete ${jobId}`);
+       promises[promiseId].resolve({ jobId, data });
+       delete promises[promiseId];
+     } else if (status === 'reject') {
+-      promises[promiseId].reject(data);
+-      delete promises[promiseId];
+-      if (action === 'load') workerResReject(data);
++      failWorker(data);
+       if (errorHandler) {
+         errorHandler(data);
+-      } else {
+-        throw Error(data);
+       }
+     } else if (status === 'progress') {
+       logger({ ...data, userJobId: jobId });
+@@ -236,6 +257,14 @@ module.exports = async (langs = 'eng', oem = OEM.LSTM_ONLY, _options = {}, confi
+     terminate,
+   };
+ 
++  if (signal) {
++    signal.addEventListener('abort', abortWorker, { once: true });
++    if (signal.aborted) {
++      abortWorker();
++      return workerRes;
++    }
++  }
++
+   loadInternal()
+     .then(() => loadLanguageInternal(langs))
+     .then(() => initializeInternal(langs, oem, config))
+diff --git a/src/index.d.ts b/src/index.d.ts
+index 2c9689db387906b7ce272ae15005f8b9aa56a269..98c9ee83217b29685ee5eec93c66ff920dda6a4a 100644
+--- a/src/index.d.ts
++++ b/src/index.d.ts
+@@ -51,6 +51,7 @@ declare namespace Tesseract {
+   }
+ 
+   interface WorkerOptions {
++    signal?: AbortSignal
+     corePath: string
+     langPath: string
+     cachePath: string

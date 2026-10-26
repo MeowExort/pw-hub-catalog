@@ -1,0 +1,138 @@
+[
+  {
+    "id": "f-001",
+    "name": "Костюм Лимонный сад",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "SHOP_GOLD",
+        "price": 34
+      }
+    ]
+  },
+  {
+    "id": "f-002",
+    "name": "Костюм Ананасовая академия",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "FAIR_GOLD",
+        "price": 50
+      }
+    ]
+  },
+  {
+    "id": "f-003",
+    "name": "Костюм Клубничное утро",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "GIFT_COINS",
+        "price": 10
+      }
+    ]
+  },
+  {
+    "id": "f-004",
+    "name": "Костюм Персиковое свидание",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "SHOP_GOLD",
+        "price": 19.5
+      },
+      {
+        "type": "FAIR_GOLD",
+        "price": 40
+      }
+    ]
+  },
+  {
+    "id": "f-005",
+    "name": "Костюм Курортная питайя",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "SHOP_GOLD",
+        "price": 30
+      }
+    ]
+  },
+  {
+    "id": "f-006",
+    "name": "Костюм Стук сердца",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "GIFT_COINS",
+        "price": 15
+      }
+    ]
+  },
+  {
+    "id": "f-007",
+    "name": "Костюм из латекса",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "SHOP_GOLD",
+        "price": 45
+      }
+    ]
+  },
+  {
+    "id": "f-008",
+    "name": "Костюм Апельсиновый прибой",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "FAIR_GOLD",
+        "price": 30
+      }
+    ]
+  },
+  {
+    "id": "f-009",
+    "name": "Костюм Дынная прогулка",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "SHOP_GOLD",
+        "price": 28
+      }
+    ]
+  },
+  {
+    "id": "f-010",
+    "name": "Костюм Вишневая дискотека",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "GIFT_COINS",
+        "price": 12
+      }
+    ]
+  },
+  {
+    "id": "f-011",
+    "name": "Зимний школьный костюм",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "SHOP_GOLD",
+        "price": 15
+      }
+    ]
+  },
+  {
+    "id": "f-012",
+    "name": "Костюм гонщицы",
+    "gender": "F",
+    "sources": [
+      {
+        "type": "SHOP_GOLD",
+        "price": 50
+      }
+    ]
+  }
+]

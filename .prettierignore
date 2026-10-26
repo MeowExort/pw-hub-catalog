@@ -1,0 +1,10 @@
+node_modules
+dist
+.audit-backup
+pnpm-lock.yaml
+public/ocr
+reports/
+test-results
+playwright-report
+coverage
+patches/

@@ -1,0 +1,63 @@
+{
+  "name": "pw-hub-catalog",
+  "private": true,
+  "version": "0.1.0",
+  "author": "MeowExort <tobilts@yandex.ru>",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": "^22.12.0 || >=24.0.0",
+    "pnpm": "9.15.9"
+  },
+  "scripts": {
+    "prepare:ocr": "node scripts/prepare-ocr.mjs",
+    "dev": "pnpm prepare:ocr && vite",
+    "build": "pnpm validate:data && pnpm prepare:ocr && tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "validate:data": "node --experimental-strip-types scripts/validate-data.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "fixtures": "node --experimental-strip-types scripts/generate-fixtures.ts",
+    "test:e2e": "pnpm build && pnpm fixtures && playwright test",
+    "benchmark": "node --experimental-strip-types scripts/benchmark.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm lint && pnpm typecheck && pnpm validate:data && pnpm test && pnpm build && pnpm format:check"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tesseract.js": "7.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.19.2",
+    "@types/pngjs": "^6.0.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^16.5.0",
+    "jsdom": "^30.1.3",
+    "pngjs": "^7.0.0",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.0",
+    "vite": "^7.3.7",
+    "vitest": "^4.1.12"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "tesseract.js@7.0.0": "patches/tesseract.js@7.0.0.patch"
+    }
+  }
+}
